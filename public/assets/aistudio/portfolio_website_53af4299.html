@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parvathiy A R | Aspiring Data Analyst & Software Engineer</title>
+    
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#080a0f',
+                        cardBg: 'rgba(18, 22, 31, 0.75)',
+                        borderGlow: 'rgba(0, 210, 255, 0.2)',
+                        cyanAccent: '#00d2ff',
+                        purpleAccent: '#7928ca',
+                        indigoAccent: '#4f46e5',
+                        textMuted: '#94a3b8'
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        heading: ['Space Grotesk', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        /* Custom Styles & Glassmorphism */
+        body {
+            background-color: #080a0f;
+            color: #f8fafc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .glass-card {
+            background: rgba(18, 22, 31, 0.65);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 210, 255, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px -10px rgba(0, 210, 255, 0.15);
+        }
+
+        .glass-nav {
+            background: rgba(8, 10, 15, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #00d2ff 0%, #7928ca 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-text-alt {
+            background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-btn {
+            background: linear-gradient(135deg, #00d2ff 0%, #4f46e5 100%);
+            transition: all 0.3s ease;
+        }
+
+        .gradient-btn:hover {
+            opacity: 0.92;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 20px;
+            width: 2px;
+            background: linear-gradient(180deg, #00d2ff 0%, #7928ca 100%);
+        }
+
+        @media (min-md: 768px) {
+            .timeline-line::before {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080a0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00d2ff;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-cyanAccent selection:text-black">
+
+    <!-- Three.js Dynamic Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 w-full z-50 glass-nav transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#hero" class="font-heading font-bold text-xl sm:text-2xl tracking-wider flex items-center gap-2">
+                <span class="gradient-text">PARVATHIY A R</span>
+                <span class="w-2 h-2 rounded-full bg-cyanAccent animate-pulse"></span>
+            </a>
+
+            <!-- Desktop Links -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-300">
+                <a href="#about" class="hover:text-cyanAccent transition-colors">About</a>
+                <a href="#skills" class="hover:text-cyanAccent transition-colors">Skills</a>
+                <a href="#experience" class="hover:text-cyanAccent transition-colors">Experience</a>
+                <a href="#projects" class="hover:text-cyanAccent transition-colors">Projects</a>
+                <a href="#education" class="hover:text-cyanAccent transition-colors">Education & Certs</a>
+                <a href="#contact" class="hover:text-cyanAccent transition-colors">Contact</a>
+            </nav>
+
+            <!-- Social Links & Action -->
+            <div class="hidden md:flex items-center gap-4">
+                <a href="https://github.com/Parvathiy-59" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors text-lg" title="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://linkedin.com/in/parvathiy-a-r-9ba37b2a1" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white transition-colors text-lg" title="LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="#contact" class="gradient-btn px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-lg">
+                    Hire Me
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="menu-btn" class="md:hidden text-gray-300 hover:text-white focus:outline-none text-2xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Nav Menu -->
+        <div id="mobile-menu" class="hidden md:hidden glass-card border-t border-gray-800 px-6 py-6 space-y-4">
+            <a href="#about" class="block text-gray-300 hover:text-cyanAccent py-1">About</a>
+            <a href="#skills" class="block text-gray-300 hover:text-cyanAccent py-1">Skills</a>
+            <a href="#experience" class="block text-gray-300 hover:text-cyanAccent py-1">Experience</a>
+            <a href="#projects" class="block text-gray-300 hover:text-cyanAccent py-1">Projects</a>
+            <a href="#education" class="block text-gray-300 hover:text-cyanAccent py-1">Education & Certs</a>
+            <a href="#contact" class="block text-gray-300 hover:text-cyanAccent py-1">Contact</a>
+            <div class="pt-4 flex items-center gap-4 border-t border-gray-800">
+                <a href="https://github.com/Parvathiy-59" target="_blank" class="text-gray-300 text-xl"><i class="fab fa-github"></i></a>
+                <a href="https://linkedin.com/in/parvathiy-a-r-9ba37b2a1" target="_blank" class="text-gray-300 text-xl"><i class="fab fa-linkedin"></i></a>
+                <a href="#contact" class="gradient-btn px-4 py-2 rounded-full text-sm font-semibold text-white w-full text-center">Hire Me</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Wrapper -->
+    <main class="pt-24 space-y-24">
+
+        <!-- Hero Section -->
+        <section id="hero" class="min-h-[85vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 relative">
+            <div class="max-w-5xl mx-auto text-center space-y-8">
+                <!-- Status Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border border-cyanAccent/30 text-xs sm:text-sm font-medium text-cyan-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    Seeking Data Analyst Intern & AI Opportunities
+                </div>
+
+                <!-- Main Heading -->
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-heading font-extrabold tracking-tight">
+                    Hi, I'm <span class="gradient-text">PARVATHIY A R</span>
+                </h1>
+
+                <!-- Subtitle / Role -->
+                <p class="text-xl sm:text-2xl text-gray-300 font-medium max-w-3xl mx-auto leading-relaxed">
+                    Aspiring <span class="text-cyanAccent font-semibold">Data Analyst</span> & Computer Science Engineer turning raw metrics into actionable, data-driven business insights.
+                </p>
+
+                <!-- Concise Summary Pill -->
+                <p class="text-sm sm:text-base text-textMuted max-w-2xl mx-auto">
+                    Proficient in Python, SQL, Power BI, Pandas, and Cognos Analytics. Passionate about machine learning, supply chain analytics, and interactive dashboard storytelling.
+                </p>
+
+                <!-- Call to Action Buttons -->
+                <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
+                    <a href="#projects" class="gradient-btn px-8 py-3.5 rounded-full font-semibold text-white shadow-lg flex items-center gap-2">
+                        <span>Explore Projects</span>
+                        <i class="fas fa-arrow-right text-sm"></i>
+                    </a>
+                    <a href="#contact" class="glass-card hover:bg-white/10 px-8 py-3.5 rounded-full font-semibold text-white border border-gray-700 flex items-center gap-2">
+                        <i class="far fa-envelope"></i>
+                        <span>Get In Touch</span>
+                    </a>
+                    <button onclick="copyEmail()" class="glass-card hover:border-cyanAccent px-4 py-3.5 rounded-full text-gray-300 hover:text-white" title="Copy Email">
+                        <i class="far fa-copy"></i>
+                    </button>
+                </div>
+
+                <!-- Quick Location & Social Strip -->
+                <div class="flex flex-wrap justify-center items-center gap-6 text-xs sm:text-sm text-textMuted pt-6">
+                    <span class="flex items-center gap-1.5"><i class="fas fa-location-dot text-cyanAccent"></i> Nagercoil, Tamil Nadu, India</span>
+                    <span class="flex items-center gap-1.5"><i class="fas fa-phone text-cyanAccent"></i> +91 8015899379</span>
+                    <a href="mailto:surthi158@gmail.com" class="flex items-center gap-1.5 hover:text-cyanAccent transition-colors"><i class="fas fa-envelope text-cyanAccent"></i> surthi158@gmail.com</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Stats & Highlights Row -->
+        <section id="about" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                <div class="glass-card p-6 text-center space-y-2">
+                    <div class="text-3xl sm:text-4xl font-heading font-bold text-cyanAccent">8.18</div>
+                    <div class="text-xs sm:text-sm text-textMuted font-medium">B.E. CSE CGPA</div>
+                    <div class="text-[10px] text-gray-500">Anna University (2023-2027)</div>
+                </div>
+                <div class="glass-card p-6 text-center space-y-2">
+                    <div class="text-3xl sm:text-4xl font-heading font-bold text-indigo-400">100%</div>
+                    <div class="text-xs sm:text-sm text-textMuted font-medium">SSLC Academic Score</div>
+                    <div class="text-[10px] text-gray-500">St. Joseph's Convent</div>
+                </div>
+                <div class="glass-card p-6 text-center space-y-2">
+                    <div class="text-3xl sm:text-4xl font-heading font-bold text-purple-400">2+</div>
+                    <div class="text-xs sm:text-sm text-textMuted font-medium">Industry Internships</div>
+                    <div class="text-[10px] text-gray-500">Femtosoft & IBM Virtual</div>
+                </div>
+                <div class="glass-card p-6 text-center space-y-2">
+                    <div class="text-3xl sm:text-4xl font-heading font-bold text-emerald-400">Elite</div>
+                    <div class="text-xs sm:text-sm text-textMuted font-medium">NPTEL Certifications</div>
+                    <div class="text-[10px] text-gray-500">Crypto, CyberSecurity & Blockchain</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Skills Section -->
+        <section id="skills" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="text-center space-y-3">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-cyanAccent">Technical Stack</h2>
+                <p class="text-3xl sm:text-4xl font-heading font-bold">Skills & Analytical Toolkit</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1: Programming & DB -->
+                <div class="glass-card p-6 space-y-4">
+                    <div class="w-12 h-12 rounded-lg bg-cyanAccent/10 border border-cyanAccent/30 flex items-center justify-center text-cyanAccent text-xl">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="text-lg font-heading font-bold">Programming & SQL</h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li class="flex items-center gap-2"><i class="fab fa-python text-yellow-400"></i> Python (Pandas, NumPy)</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-database text-blue-400"></i> SQL (Queries, Joins)</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-diagram-project text-green-400"></i> Relational Schemas</li>
+                    </ul>
+                </div>
+
+                <!-- Card 2: Data Analysis & ML -->
+                <div class="glass-card p-6 space-y-4">
+                    <div class="w-12 h-12 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xl">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3 class="text-lg font-heading font-bold">Data Analysis & ML</h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li class="flex items-center gap-2"><i class="fas fa-magnifying-glass-chart text-cyanAccent"></i> EDA & Cleaning</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-brain text-pink-400"></i> Basic Machine Learning</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-square-root-variable text-amber-400"></i> Predictive Modeling</li>
+                    </ul>
+                </div>
+
+                <!-- Card 3: Visualization & BI -->
+                <div class="glass-card p-6 space-y-4">
+                    <div class="w-12 h-12 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xl">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-lg font-heading font-bold">Visualization & BI</h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li class="flex items-center gap-2"><i class="fas fa-chart-simple text-amber-500"></i> Power BI Dashboards</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-file-excel text-emerald-500"></i> Microsoft Excel (Advanced)</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-cube text-blue-500"></i> IBM Cognos Analytics</li>
+                    </ul>
+                </div>
+
+                <!-- Card 4: Web & Tools -->
+                <div class="glass-card p-6 space-y-4">
+                    <div class="w-12 h-12 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3 class="text-lg font-heading font-bold">Web Tech & Tools</h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li class="flex items-center gap-2"><i class="fab fa-git-alt text-orange-500"></i> Git & GitHub</li>
+                        <li class="flex items-center gap-2"><i class="fab fa-html5 text-orange-400"></i> HTML5, CSS3, JavaScript</li>
+                        <li class="flex items-center gap-2"><i class="fas fa-terminal text-purple-400"></i> Google Colab</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience & Internships Section -->
+        <section id="experience" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div class="text-center space-y-3">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-cyanAccent">Career Journey</h2>
+                <p class="text-3xl sm:text-4xl font-heading font-bold">Internship Experience</p>
+            </div>
+
+            <div class="relative max-w-4xl mx-auto space-y-8">
+                <!-- Experience Item 1 -->
+                <div class="glass-card p-6 sm:p-8 relative border-l-4 border-l-cyanAccent">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-xl font-heading font-bold text-white">AI & Data Science Intern</h3>
+                            <p class="text-cyanAccent font-medium text-sm">Femtosoft Technologies</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-cyanAccent/10 border border-cyanAccent/30 text-cyan-300 text-xs font-semibold w-max">
+                            June 2026 – July 2026
+                        </span>
+                    </div>
+                    <ul class="space-y-2 text-sm text-gray-300 list-disc list-inside">
+                        <li>Applied core AI and Data Science concepts to real-world data-driven business applications.</li>
+                        <li>Engineered a comprehensive <strong class="text-white">Supply Chain Logistics Dashboard with Delivery Delay Prediction</strong> to evaluate performance metrics and forecast delay risks.</li>
+                        <li>Cleaned and prepared unstructured logistics datasets using Python (Pandas/NumPy) and visualized KPIs in Power BI.</li>
+                    </ul>
+                </div>
+
+                <!-- Experience Item 2 -->
+                <div class="glass-card p-6 sm:p-8 relative border-l-4 border-l-purpleAccent">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-xl font-heading font-bold text-white">IBM Virtual Intern</h3>
+                            <p class="text-purple-400 font-medium text-sm">IBM Cognos Analytics Program</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold w-max">
+                            March 2026 – April 2026
+                        </span>
+                    </div>
+                    <ul class="space-y-2 text-sm text-gray-300 list-disc list-inside">
+                        <li>Created dynamic multi-tab dashboards, generated automated business reports, and analyzed structured data using IBM Cognos Analytics.</li>
+                        <li>Constructed complex conditional styling and report prompts for organizational data exploration.</li>
+                        <li>Analyzed multi-branch operational datasets to distill key operational findings into executive stories.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <div class="text-center space-y-3">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-cyanAccent">Portfolio Showcase</h2>
+                <p class="text-3xl sm:text-4xl font-heading font-bold">Featured Projects</p>
+            </div>
+
+            <!-- Project Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Project 1 -->
+                <div class="glass-card p-6 sm:p-8 flex flex-col justify-between space-y-6 group">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono px-3 py-1 rounded-full bg-cyanAccent/10 text-cyanAccent border border-cyanAccent/20">Data Analytics & ML</span>
+                            <i class="fas fa-truck-fast text-2xl text-cyanAccent"></i>
+                        </div>
+                        <h3 class="text-2xl font-heading font-bold group-hover:text-cyanAccent transition-colors">Supply Chain Logistics Dashboard</h3>
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                            A predictive analytical system designed to identify bottleneck factors in logistics, compute delivery delay probabilities, and visualize carrier metrics for optimal route planning.
+                        </p>
+                        <div class="flex flex-wrap gap-2 pt-2">
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">Python</span>
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">Pandas</span>
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">Power BI</span>
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">Google Colab</span>
+                        </div>
+                    </div>
+                    <button onclick="openModal('project1')" class="text-sm font-semibold text-cyanAccent hover:underline inline-flex items-center gap-2 pt-4">
+                        View Project Breakdown <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="glass-card p-6 sm:p-8 flex flex-col justify-between space-y-6 group">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">BI & Reporting</span>
+                            <i class="fas fa-book-bookmark text-2xl text-purple-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-heading font-bold group-hover:text-purple-400 transition-colors">KnowledgeHub Library Analytics</h3>
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                            Circulation and membership analytics suite built in IBM Cognos. Organized reporting by branch/genre, issues, returns, overdue counts, and fine collections with conditional styling.
+                        </p>
+                        <div class="flex flex-wrap gap-2 pt-2">
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">IBM Cognos</span>
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">Data Analytics</span>
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">Conditional Reports</span>
+                        </div>
+                    </div>
+                    <button onclick="openModal('project2')" class="text-sm font-semibold text-purple-400 hover:underline inline-flex items-center gap-2 pt-4">
+                        View Project Breakdown <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="glass-card p-6 sm:p-8 flex flex-col justify-between space-y-6 group">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Web Application</span>
+                            <i class="fas fa-person-running text-2xl text-emerald-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-heading font-bold group-hover:text-emerald-400 transition-colors">StudySprint Progress Dashboard</h3>
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                            A web-based tracker assisting students to monitor learning milestones, track daily sprint targets, and visualize real-time progress metrics with responsive UI.
+                        </p>
+                        <div class="flex flex-wrap gap-2 pt-2">
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">HTML5</span>
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">CSS3</span>
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">JavaScript</span>
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">Vercel</span>
+                        </div>
+                    </div>
+                    <button onclick="openModal('project3')" class="text-sm font-semibold text-emerald-400 hover:underline inline-flex items-center gap-2 pt-4">
+                        View Project Breakdown <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="glass-card p-6 sm:p-8 flex flex-col justify-between space-y-6 group">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Frontend Engineering</span>
+                            <i class="fas fa-layer-group text-2xl text-indigo-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-heading font-bold group-hover:text-indigo-400 transition-colors">Dynamic Single Page Application</h3>
+                        <p class="text-sm text-gray-300 leading-relaxed">
+                            A lightweight, modular SPA featuring dynamic client-side content rendering from structured JSON datasources with zero page reloads.
+                        </p>
+                        <div class="flex flex-wrap gap-2 pt-2">
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">JavaScript</span>
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">JSON API</span>
+                            <span class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300">Responsive Design</span>
+                        </div>
+                    </div>
+                    <button onclick="openModal('project4')" class="text-sm font-semibold text-indigo-400 hover:underline inline-flex items-center gap-2 pt-4">
+                        View Project Breakdown <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Education, Certifications & Achievements Section -->
+        <section id="education" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div class="text-center space-y-3">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-cyanAccent">Background & Credentials</h2>
+                <p class="text-3xl sm:text-4xl font-heading font-bold">Education, Certifications & Awards</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Column 1: Education -->
+                <div class="glass-card p-6 space-y-6">
+                    <div class="flex items-center gap-3 border-b border-gray-800 pb-4">
+                        <i class="fas fa-graduation-cap text-2xl text-cyanAccent"></i>
+                        <h3 class="text-xl font-heading font-bold">Education</h3>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-white">B.E. CSE</h4>
+                                <span class="text-xs text-cyanAccent">2023 – 2027</span>
+                            </div>
+                            <p class="text-xs text-gray-400">University College of Engineering, Nagercoil (Anna University)</p>
+                            <p class="text-xs font-semibold text-emerald-400">CGPA: 8.18</p>
+                        </div>
+
+                        <div class="space-y-1 border-t border-gray-800/60 pt-4">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-white">Higher Secondary (HSC)</h4>
+                                <span class="text-xs text-gray-400">2022 – 2023</span>
+                            </div>
+                            <p class="text-xs text-gray-400">St. Joseph's Convent Higher Secondary School</p>
+                            <p class="text-xs font-semibold text-emerald-400">Percentage: 89%</p>
+                        </div>
+
+                        <div class="space-y-1 border-t border-gray-800/60 pt-4">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold text-white">Secondary School (SSLC)</h4>
+                                <span class="text-xs text-gray-400">2020 – 2021</span>
+                            </div>
+                            <p class="text-xs text-gray-400">St. Joseph's Convent Higher Secondary School</p>
+                            <p class="text-xs font-semibold text-emerald-400">Percentage: 100%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Certifications -->
+                <div class="glass-card p-6 space-y-6">
+                    <div class="flex items-center gap-3 border-b border-gray-800 pb-4">
+                        <i class="fas fa-certificate text-2xl text-purple-400"></i>
+                        <h3 class="text-xl font-heading font-bold">Certifications</h3>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 rounded bg-white/5 border border-purple-500/20">
+                            <p class="font-bold text-white">NPTEL Elite Certification</p>
+                            <p class="text-gray-400">Cryptography & Network Security, Cybersecurity & Privacy, Blockchain Applications</p>
+                        </div>
+                        <div class="p-3 rounded bg-white/5 border border-purple-500/20">
+                            <p class="font-bold text-white">IBM Certified</p>
+                            <p class="text-gray-400">Introduction to IBM Cognos Analytics</p>
+                        </div>
+                        <div class="p-3 rounded bg-white/5 border border-purple-500/20">
+                            <p class="font-bold text-white">Infosys Springboard</p>
+                            <p class="text-gray-400">Agile Methodology, DevOps, Azure Cloud Computing, AI Basics, Business Communication</p>
+                        </div>
+                        <div class="p-3 rounded bg-white/5 border border-purple-500/20">
+                            <p class="font-bold text-white">TCS Youth Employment Program</p>
+                            <p class="text-gray-400">Professional Workplace Readiness</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3: Achievements & Workshops -->
+                <div class="glass-card p-6 space-y-6">
+                    <div class="flex items-center gap-3 border-b border-gray-800 pb-4">
+                        <i class="fas fa-trophy text-2xl text-amber-400"></i>
+                        <h3 class="text-xl font-heading font-bold">Awards & Workshops</h3>
+                    </div>
+
+                    <div class="space-y-4 text-xs">
+                        <div class="space-y-2">
+                            <p class="font-bold text-amber-400 uppercase tracking-wider text-[10px]">Symposium Honors</p>
+                            <ul class="space-y-2 text-gray-300">
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-medal text-amber-400 mt-0.5"></i>
+                                    <span><strong>1st Prize – Idea Presentation:</strong> Digital Legacy Manager (College Symposium)</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-medal text-amber-400 mt-0.5"></i>
+                                    <span><strong>1st Prize:</strong> Detectives & Chronicles Event (2026 Symposium)</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="border-t border-gray-800/60 pt-4 space-y-2">
+                            <p class="font-bold text-cyanAccent uppercase tracking-wider text-[10px]">Workshops & Seminars</p>
+                            <p class="text-gray-300">
+                                Participated in Institution's Innovation Council (IIC) workshop on Lean Start-Up & Minimum Viable Product (MVP) / Business Mentoring Session.
+                            </p>
+                        </div>
+
+                        <div class="border-t border-gray-800/60 pt-4 space-y-2">
+                            <p class="font-bold text-emerald-400 uppercase tracking-wider text-[10px]">Languages</p>
+                            <p class="text-gray-300">Tamil (Native), English (Fluent), Malayalam (Listening)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="glass-card p-8 sm:p-12 text-center space-y-8 border-t-2 border-t-cyanAccent">
+                <div class="space-y-3">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-cyanAccent">Get In Touch</h2>
+                    <p class="text-3xl sm:text-4xl font-heading font-bold">Let's Connect & Collaborate</p>
+                    <p class="text-sm text-textMuted max-w-lg mx-auto">
+                        Open for Data Analyst internships, collaborative research projects, and entry-level analytical roles.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left max-w-2xl mx-auto">
+                    <a href="mailto:surthi158@gmail.com" class="glass-card p-4 flex items-center gap-4 hover:border-cyanAccent">
+                        <div class="w-10 h-10 rounded-full bg-cyanAccent/10 flex items-center justify-center text-cyanAccent">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-400">Direct Email</p>
+                            <p class="text-sm font-semibold text-white">surthi158@gmail.com</p>
+                        </div>
+                    </a>
+
+                    <a href="tel:+918015899379" class="glass-card p-4 flex items-center gap-4 hover:border-emerald-400">
+                        <div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-400">Phone</p>
+                            <p class="text-sm font-semibold text-white">+91 8015899379</p>
+                        </div>
+                    </a>
+
+                    <a href="https://linkedin.com/in/parvathiy-a-r-9ba37b2a1" target="_blank" class="glass-card p-4 flex items-center gap-4 hover:border-blue-400">
+                        <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+                            <i class="fab fa-linkedin"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-400">LinkedIn Profile</p>
+                            <p class="text-sm font-semibold text-white">parvathiy-a-r</p>
+                        </div>
+                    </a>
+
+                    <a href="https://github.com/Parvathiy-59" target="_blank" class="glass-card p-4 flex items-center gap-4 hover:border-purple-400">
+                        <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400">
+                            <i class="fab fa-github"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-400">GitHub Profile</p>
+                            <p class="text-sm font-semibold text-white">Parvathiy-59</p>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="pt-4">
+                    <button onclick="copyEmail()" class="gradient-btn px-8 py-3 rounded-full font-semibold text-white text-sm">
+                        Copy Email Address
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-20 border-t border-gray-800 py-8 text-center text-xs text-gray-500">
+        <p>&copy; 2026 Parvathiy A R. Designed for fast loading & Firebase deployment.</p>
+    </footer>
+
+    <!-- Project Detail Modal -->
+    <div id="project-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div class="glass-card max-w-2xl w-full p-6 sm:p-8 space-y-6 border border-cyanAccent/40 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">
+                <i class="fas fa-times"></i>
+            </button>
+            <div id="modal-content" class="space-y-4">
+                <!-- Modal content dynamically injected -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden glass-card border border-cyanAccent px-6 py-3 text-sm text-cyan-300">
+        Email copied to clipboard!
+    </div>
+
+    <!-- JavaScript & Three.js Canvas Controller -->
+    <script>
+        // --- 1. Three.js Background Canvas Animation ---
+        let scene, camera, renderer, particles;
+        let mouseX = 0, mouseY = 0;
+
+        function initThreeJS() {
+            const canvas = document.getElementById('bg-canvas');
+            scene = new THREE.Scene();
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 4;
+
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Particle Geometry Creation (Constellation Data Mesh)
+            const count = 600;
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+
+            for (let i = 0; i < count * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 12;
+                positions[i + 1] = (Math.random() - 0.5) * 12;
+                positions[i + 2] = (Math.random() - 0.5) * 12;
+
+                // Alternate between Cyan (#00d2ff) and Purple (#7928ca)
+                if (Math.random() > 0.5) {
+                    colors[i] = 0.0;     // R
+                    colors[i + 1] = 0.82;// G
+                    colors[i + 2] = 1.0; // B
+                } else {
+                    colors[i] = 0.47;
+                    colors[i + 1] = 0.15;
+                    colors[i + 2] = 0.79;
+                }
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.025,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.85
+            });
+
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            // Responsive Window Listener
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('mousemove', onMouseMove);
+        }
+
+        function onMouseMove(event) {
+            mouseX = (event.clientX / window.innerWidth - 0.5) * 0.4;
+            mouseY = (event.clientY / window.innerHeight - 0.5) * 0.4;
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animateThreeJS() {
+            requestAnimationFrame(animateThreeJS);
+            if (particles) {
+                particles.rotation.y += 0.0008;
+                particles.rotation.x += (mouseY - particles.rotation.x) * 0.02;
+                particles.rotation.y += (mouseX - particles.rotation.y) * 0.02;
+            }
+            renderer.render(scene, camera);
+        }
+
+        // --- 2. Interactive UI Functions ---
+        const projectData = {
+            project1: {
+                title: "Supply Chain Logistics Dashboard",
+                subtitle: "Delivery Delay Prediction",
+                tech: "Python, Pandas, NumPy, Power BI, Google Colab",
+                details: "Built an end-to-end analytical pipeline to analyze logistics bottlenecks and predict delivery risk percentages. Raw logistics datasets were cleaned using Pandas and NumPy in Google Colab, followed by building interactive KPI dashboards in Power BI."
+            },
+            project2: {
+                title: "KnowledgeHub Library Analytics",
+                subtitle: "Circulation & Membership Insights",
+                tech: "IBM Cognos Analytics, SQL, Data Modeling",
+                details: "Analyzed library branch loans, returns, overdue frequencies, and collected fine figures using IBM Cognos Analytics. Created interactive prompts, drill-through reports, and custom conditional logic for branch managers."
+            },
+            project3: {
+                title: "StudySprint Progress Dashboard",
+                subtitle: "Interactive Student Tracker",
+                tech: "HTML5, CSS3, JavaScript, Vercel",
+                details: "A web-based productivity app for students to track exam sprint milestones and study session progress with modular JS components and local persistence."
+            },
+            project4: {
+                title: "Single Page Application (SPA)",
+                subtitle: "Dynamic Content Renderer",
+                tech: "JavaScript, JSON, CSS3",
+                details: "Developed a responsive web application leveraging asynchronous dynamic content rendering from structured JSON datasources with modular routing."
+            }
+        };
+
+        function openModal(key) {
+            const data = projectData[key];
+            if (!data) return;
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <span class="text-xs font-mono text-cyanAccent uppercase tracking-widest">${data.subtitle}</span>
+                <h3 class="text-2xl font-heading font-bold text-white">${data.title}</h3>
+                <div class="p-3 bg-white/5 rounded border border-gray-800 text-xs text-gray-300">
+                    <strong>Tech Used:</strong> ${data.tech}
+                </div>
+                <p class="text-sm text-gray-300 leading-relaxed">${data.details}</p>
+            `;
+            document.getElementById('project-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('project-modal').classList.add('hidden');
+        }
+
+        function copyEmail() {
+            const email = "surthi158@gmail.com";
+            const el = document.createElement('textarea');
+            el.value = email;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // --- Mobile Menu Toggle ---
+        document.getElementById('menu-btn')?.addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // --- Window Load Execution ---
+        window.onload = function() {
+            initThreeJS();
+            animateThreeJS();
+        };
+    </script>
+</body>
+</html>
